@@ -3,6 +3,37 @@ import { assets } from '../assets/assets'
 
 
 const Main = () => {
+
+    const [question, setQuestion] = useState("");
+    const [answer, setAnswer] = useState("");
+    const [generatingAnswer, setGeneratingAnswer] = useState(false);
+  
+    async function generateAnswer(e) {
+      setGeneratingAnswer(true);
+      e.preventDefault();
+      setAnswer("Loading your answer... \n It might take upto 10 seconds");
+      try {
+        const response = await axios({
+          url: `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${
+            import.meta.env.VITE_API_GENERATIVE_LANGUAGE_CLIENT
+          }`,
+          method: "post",
+          data: {
+            contents: [{ parts: [{ text: question }] }],
+          },
+        });
+  
+        setAnswer(
+          response["data"]["candidates"][0]["content"]["parts"][0]["text"]
+        );
+      } catch (error) {
+        console.log(error);
+        setAnswer("Sorry - Something went wrong. Please try again!");
+      }
+  
+      setGeneratingAnswer(false);
+    }
+
   return (
     <div className='main'>
         <div className="nav">
